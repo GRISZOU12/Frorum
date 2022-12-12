@@ -6,7 +6,7 @@ PORT = 65432
 
 def ping():
     try:
-        to_send = b'ping'
+        to_send = b'pin'
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
             s.sendall(to_send)

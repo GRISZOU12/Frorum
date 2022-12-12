@@ -1,3 +1,5 @@
+# this is a little server for the test of the client (the good server program is server and you can use it with main_pico.py on a raspberry pi pico)
+
 import socket
 
 HOST = "127.0.0.1"
