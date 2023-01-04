@@ -1,4 +1,7 @@
 import tkinter
+import client_sockets
+import client_functions
+
 
 class Launcher:
     def __init__(self):
@@ -11,36 +14,40 @@ class Launcher:
         self.gui = tkinter.Tk()
         self.gui.geometry("700x350")
         self.gui.title("Frorum | Launcher")
+        # self.gui.iconbitmap("./assets/frorum_icon.ico") (not available for now)
         self.gui.configure(bg=self.background_color)
-        # load the textual headers
+        # load the textual headers images
         self.text_header_first_state = tkinter.PhotoImage(file=r"./assets/connect_page/header_label_first_state.png")
         self.text_header_second_state = tkinter.PhotoImage(file=r"./assets/connect_page/header_label_second_state.png")
         # the third ( not available for now )
+        # load the button images
         self.connect_button_first_state = tkinter.PhotoImage(file=r"./assets/connect_page/connect_button_first_state.png")
         self.connect_button_second_state = tkinter.PhotoImage(file=r"./assets/connect_page/connect_button_second_state.png")
-        # third is an empty image
+        # shadow of the button :
+        # self.connect_button_shadow = tkinter.PhotoImage(file=r'./assets/connect_page/connect_button_shadow.png')
+        # create the header and display it ( the image is preset to the first state cause else and i don't know why it is not displayed
+        self.text_header_label = tkinter.Label(self.gui, bg=self.background_color, image=self.text_header_first_state)
+        # same but for connect/retry button
+        self.connect_button = tkinter.Button(self.gui, bg=self.background_color, borderwidth=0, relief=tkinter.FLAT, activebackground=self.background_color, command=self.ping_server)
 
     def first_state(self):
-        self.text_header_first_state_label = tkinter.Label(self.gui, image=self.text_header_first_state, bg=self.background_color)
-        self.text_header_first_state_label.place(x=105, y=50)
+        # reconfig the widgets to display the right things
+        self.connect_button.configure(image=self.text_header_first_state)
+        self.text_header_label.place(x=105, y=50)
+        self.connect_button.configure(image=self.connect_button_first_state)
+        self.connect_button.place(x=261, y=261)
+    
+    def second_state(self):
+        self.text_header_label.configure(image=self.text_header_second_state)
+        self.connect_button.configure(image=self.connect_button_second_state)
 
-        self.connect_button_first_state_button = tkinter.Button(self.gui, image=self.connect_button_first_state, bg=self.background_color, borderwidth=0, relief=tkinter.FLAT, activebackground=self.background_color)
-        self.connect_button_first_state_button.place(x=261, y=261)
-
-    def load_processing_gif(self):
-        # code from https://stackoverflow.com/questions/28518072/play-animations-in-gif-with-tkinter
-        frames_count = 36
-        frames = [tkinter.PhotoImage(file=r'./assets/connect_page/processing_gif.gif', format='gif -index %i' % i) for i in range(frames_count)]
-
-        def update(ind):
-            frame = frames[ind]
-            ind += 1
-            if ind == frames_count:
-                ind = 0
-            processing_gif.configure(image=frame)
-            self.gui.after(100, update, ind)
-
-        processing_gif = tkinter.Label(self.gui, bg=self.background_color)
-        processing_gif.pack()
-        self.gui.after(0, update, 0)
-
+    def third_state(self):
+        pass
+        
+    def ping_server(self):
+        client_functions.animate_gif(surface=self.gui, path="./assets/connect_page/processing_gif.gif")
+        self.server_connection = client_sockets.ping()
+        if self.server_connection:
+            self.third_state()
+        else:
+            self.second_state()
